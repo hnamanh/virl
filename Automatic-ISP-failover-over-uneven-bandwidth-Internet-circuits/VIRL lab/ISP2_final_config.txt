@@ -1,0 +1,182 @@
+!
+! Last configuration change at 17:09:32 UTC Sun Sep 6 2015
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname ISP2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable password cisco
+!
+no aaa new-model
+ethernet lmi ce
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+redundancy
+!
+no cdp run
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Loopback
+ ip address 192.168.0.4 255.255.255.255
+!
+interface Loopback2
+ ip address 2.2.2.2 255.255.255.255
+!
+interface Loopback4
+ ip address 4.4.4.4 255.255.255.255
+!
+interface Loopback6
+ ip address 6.6.6.6 255.255.255.255
+!
+interface Loopback8
+ ip address 8.8.8.8 255.255.255.255
+!
+interface Loopback10
+ ip address 10.10.10.10 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description OOB Management
+ ip address 10.255.1.129 255.255.0.0
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/1
+ description to R1
+ ip address 12.12.12.1 255.255.255.0
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/2
+ ip address 34.34.34.4 255.255.255.0
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/3
+ ip address 45.45.45.4 255.255.255.0
+ duplex auto
+ speed auto
+ media-type rj45
+!
+router bgp 7018
+ bgp router-id 192.168.0.4
+ bgp log-neighbor-changes
+ redistribute connected
+ neighbor 12.12.12.2 remote-as 65000
+ neighbor 12.12.12.2 default-originate
+ neighbor 12.12.12.2 soft-reconfiguration inbound
+ neighbor 12.12.12.2 prefix-list OUTBOUND out
+ neighbor 12.12.12.2 maximum-prefix 600000 95 warning-only
+ neighbor 34.34.34.3 remote-as 4323
+ neighbor 34.34.34.3 soft-reconfiguration inbound
+ neighbor 34.34.34.3 maximum-prefix 600000 95 warning-only
+ neighbor 45.45.45.5 remote-as 20001
+ neighbor 45.45.45.5 soft-reconfiguration inbound
+ neighbor 45.45.45.5 maximum-prefix 600000 95 warning-only
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list OUTBOUND seq 10 permit 2.2.2.2/32
+ip prefix-list OUTBOUND seq 20 permit 4.4.4.4/32
+ip prefix-list OUTBOUND seq 30 permit 6.6.6.6/32
+ip prefix-list OUTBOUND seq 40 permit 8.8.8.8/32
+ip prefix-list OUTBOUND seq 50 permit 10.10.10.10/32
+!
+!
+!
+control-plane
+!
+banner exec `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner incoming `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner login `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+!
+line con 0
+ password cisco
+line aux 0
+line vty 0 4
+ exec-timeout 720 0
+ password cisco
+ login
+ transport input telnet ssh
+!
+no scheduler allocate
+!
+end

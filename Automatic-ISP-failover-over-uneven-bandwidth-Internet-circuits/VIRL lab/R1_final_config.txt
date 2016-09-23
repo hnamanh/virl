@@ -1,0 +1,203 @@
+!
+! Last configuration change at 17:22:48 UTC Sun Sep 6 2015
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable password cisco
+!
+no aaa new-model
+ethernet lmi ce
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+redundancy
+!
+no cdp run
+!
+track 1 ip route 0.0.0.0 0.0.0.0 reachability
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Loopback
+ ip address 192.168.0.1 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description OOB Management
+ ip address 10.255.1.132 255.255.0.0
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/1
+ description to Switch
+ ip address 22.0.0.2 255.255.255.0
+ standby 1 ip 22.0.0.1
+ standby 1 priority 105
+ standby 1 preempt
+ standby 1 track 1 decrement 10
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/2
+ description to ISP1
+ ip address 206.206.206.2 255.255.255.0
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/3
+ description to ISP2
+ ip address 12.12.12.2 255.255.255.0
+ duplex auto
+ speed auto
+ media-type rj45
+!
+router bgp 65000
+ bgp router-id 192.168.0.1
+ bgp log-neighbor-changes
+ network 22.0.0.0 mask 255.255.255.0
+ neighbor 12.12.12.1 remote-as 7018
+ neighbor 206.206.206.1 remote-as 4323
+ neighbor 206.206.206.1 description TWT
+ neighbor 206.206.206.1 soft-reconfiguration inbound
+ neighbor 206.206.206.1 prefix-list TWT-4323-OUT-FILTER out
+ neighbor 206.206.206.1 route-map TWT-4323-INBOUND in
+ neighbor 206.206.206.1 maximum-prefix 600000 95 warning-only
+!
+ip forward-protocol nd
+!
+ip as-path access-list 1 permit ^7018_[0-9]*$
+ip as-path access-list 2 permit ^4323_[0-9]*$
+!
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list ATT-7018-IN-FILTER seq 10 deny 0.0.0.0/8 le 32
+ip prefix-list ATT-7018-IN-FILTER seq 20 deny 10.0.0.0/8 le 32
+ip prefix-list ATT-7018-IN-FILTER seq 40 deny 127.0.0.0/8 le 32
+ip prefix-list ATT-7018-IN-FILTER seq 50 deny 169.254.0.0/16 le 32
+ip prefix-list ATT-7018-IN-FILTER seq 60 deny 172.16.0.0/12 le 32
+ip prefix-list ATT-7018-IN-FILTER seq 70 deny 192.0.2.0/24 le 32
+ip prefix-list ATT-7018-IN-FILTER seq 80 deny 192.168.0.0/16 le 32
+ip prefix-list ATT-7018-IN-FILTER seq 90 deny 224.0.0.0/3 le 32
+ip prefix-list ATT-7018-IN-FILTER seq 100 deny 0.0.0.0/0 ge 25
+ip prefix-list ATT-7018-IN-FILTER seq 110 deny 22.0.0.0/24 le 32
+ip prefix-list ATT-7018-IN-FILTER seq 9999 permit 0.0.0.0/0 le 32
+!
+ip prefix-list ATT-7018-OUT-FILTER seq 10 permit 22.0.0.0/24
+ip prefix-list ATT-7018-OUT-FILTER seq 9999 deny 0.0.0.0/0 le 32
+!
+ip prefix-list TWT-4323-IN-FILTER seq 10 deny 0.0.0.0/8 le 32
+ip prefix-list TWT-4323-IN-FILTER seq 20 deny 10.0.0.0/8 le 32
+ip prefix-list TWT-4323-IN-FILTER seq 40 deny 127.0.0.0/8 le 32
+ip prefix-list TWT-4323-IN-FILTER seq 50 deny 169.254.0.0/16 le 32
+ip prefix-list TWT-4323-IN-FILTER seq 60 deny 172.16.0.0/12 le 32
+ip prefix-list TWT-4323-IN-FILTER seq 70 deny 192.0.2.0/24 le 32
+ip prefix-list TWT-4323-IN-FILTER seq 80 deny 192.168.0.0/16 le 32
+ip prefix-list TWT-4323-IN-FILTER seq 90 deny 224.0.0.0/3 le 32
+ip prefix-list TWT-4323-IN-FILTER seq 100 deny 0.0.0.0/0 ge 25
+ip prefix-list TWT-4323-IN-FILTER seq 110 deny 22.0.0.0/24 le 32
+ip prefix-list TWT-4323-IN-FILTER seq 9999 permit 0.0.0.0/0 le 32
+!
+ip prefix-list TWT-4323-OUT-FILTER seq 10 permit 22.0.0.0/24
+ip prefix-list TWT-4323-OUT-FILTER seq 9999 deny 0.0.0.0/0 le 32
+!
+route-map TWT-4323-INBOUND permit 10
+ match as-path 2
+!
+route-map ATT-7018-INBOUND permit 10
+ match as-path 1
+!
+!
+!
+control-plane
+!
+banner exec `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner incoming `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner login `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+!
+line con 0
+ password cisco
+line aux 0
+line vty 0 4
+ exec-timeout 720 0
+ password cisco
+ login
+ transport input telnet ssh
+!
+no scheduler allocate
+!
+end

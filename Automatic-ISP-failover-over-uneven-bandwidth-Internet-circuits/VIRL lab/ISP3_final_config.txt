@@ -1,0 +1,173 @@
+!
+! Last configuration change at 17:21:42 UTC Sun Sep 6 2015
+!
+version 15.5
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname ISP3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable password cisco
+!
+no aaa new-model
+ethernet lmi ce
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+redundancy
+!
+no cdp run
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Loopback
+ ip address 192.168.0.5 255.255.255.255
+!
+interface Loopback11
+ ip address 11.11.11.11 255.255.255.255
+!
+interface Loopback33
+ ip address 33.33.33.33 255.255.255.255
+!
+interface Loopback55
+ ip address 55.55.55.55 255.255.255.255
+!
+interface Loopback77
+ ip address 77.77.77.77 255.255.255.255
+!
+interface Loopback99
+ ip address 99.99.99.99 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description OOB Management
+ ip address 10.255.1.128 255.255.0.0
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/1
+ description to R2
+ ip address 24.24.24.1 255.255.255.0
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/2
+ ip address 45.45.45.5 255.255.255.0
+ duplex auto
+ speed auto
+ media-type rj45
+!
+router bgp 20001
+ bgp router-id 192.168.0.5
+ bgp log-neighbor-changes
+ redistribute connected
+ neighbor 24.24.24.2 remote-as 65000
+ neighbor 24.24.24.2 default-originate
+ neighbor 24.24.24.2 soft-reconfiguration inbound
+ neighbor 24.24.24.2 prefix-list OUTBOUND out
+ neighbor 24.24.24.2 maximum-prefix 600000 95 warning-only
+ neighbor 45.45.45.4 remote-as 7018
+ neighbor 45.45.45.4 soft-reconfiguration inbound
+ neighbor 45.45.45.4 maximum-prefix 600000 95 warning-only
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list OUTBOUND seq 10 permit 11.11.11.11/32
+ip prefix-list OUTBOUND seq 20 permit 33.33.33.33/32
+ip prefix-list OUTBOUND seq 30 permit 55.55.55.55/32
+ip prefix-list OUTBOUND seq 40 permit 77.77.77.77/32
+ip prefix-list OUTBOUND seq 50 permit 99.99.99.99/32
+!
+!
+!
+control-plane
+!
+banner exec `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner incoming `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner login `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+!
+line con 0
+ password cisco
+line aux 0
+line vty 0 4
+ exec-timeout 720 0
+ password cisco
+ login
+ transport input telnet ssh
+!
+no scheduler allocate
+!
+end

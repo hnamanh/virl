@@ -1,0 +1,23 @@
+1. Login to each server using username "cisco" and password "cisco". 
+Elevate user privilege to "root" by using command "sudo -s". Enter password "cisco".
+
+2. Prepare the Linux servers with appropriate IP addresses and routing information.
+!LAN server
+ifconfig eth1 up 192.168.0.200 netmask 255.255.255.0
+route add -net 10.1.1.0 netmask 255.255.255.0 gw 192.168.0.1 dev eth1
+route add -net 192.168.0.0 netmask 255.255.0.0 gw 192.168.0.1 dev eth1
+
+!DMZ1 server
+ifconfig eth1 up 192.168.1.10 netmask 255.255.255.0
+route add -net 10.1.1.0 netmask 255.255.255.0 gw 192.168.1.1 dev eth1
+route add -net 192.168.0.0 netmask 255.255.0.0 gw 192.168.1.1 dev eth1
+
+!DMZ2 server
+ifconfig eth1 up 192.168.2.10 netmask 255.255.255.0
+route add -net 10.1.1.0 netmask 255.255.255.0 gw 192.168.2.1 dev eth1
+route add -net 192.168.0.0 netmask 255.255.0.0 gw 192.168.2.1 dev eth1
+
+!Internet server
+ifconfig eth1 up 10.1.1.200 netmask 255.255.255.0
+
+Congrats, you now have a fully working network simulation.
